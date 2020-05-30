@@ -1,209 +1,220 @@
 /*
 1.
-Read the notes about this table. Observe the result of running this SQL command to show the name, continent and population of all countries.
-https://sqlzoo.net/wiki/Read_the_notes_about_this_table.
-SELECT name, continent, population FROM world
+Change the query shown so that it displays Nobel prizes for 1950.
+SELECT yr, subject, winner
+  FROM nobel
+ WHERE yr = 1960
 */
 
 SELECT
-  name,
-  continent,
-  population
-FROM world;
+  yr,
+  subject,
+  winner
+FROM nobel
+WHERE
+  (yr = 1950);
 
 /*
 2.
-How to use WHERE to filter records. Show the name for the countries that have a population of at least 200 million. 200 million is 200000000, there are eight zeros.
-https://sqlzoo.net/wiki/WHERE_filters
-SELECT name FROM world
-WHERE population = 64105700
+Show who won the 1962 prize for Literature.
+SELECT winner
+  FROM nobel
+ WHERE yr = 1960
+   AND subject = 'Physics'
 */
 
 SELECT
-  name
-FROM world
+  winner
+FROM nobel
 WHERE
-  (population >= 200000000);
+  (yr = 1962)
+AND
+  (subject = 'Literature');
 
 /*
 3.
-Give the name and the per capita GDP for those countries with a population of at least 200 million.
-HELP:How to calculate per capita GDP
-per capita GDP is the GDP divided by the population GDP/population
+Show the year and subject that won 'Albert Einstein' his prize.
 */
 
 SELECT
-  name,
-  (gdp/population) AS "GDP/population"
-FROM world
+  yr,
+  subject
+FROM nobel
 WHERE
-  (population >= 200000000);
+ (winner = 'Albert Einstein');
 
 /*
 4.
-Show the name and population in millions for the countries of the continent 'South America'. Divide the population by 1000000 to get population in millions.
+Give the name of the 'Peace' winners since the year 2000, including 2000.
 */
 
 SELECT
-  name,
-  (population/1000000) AS "population in millions"
-FROM world
+  winner
+FROM nobel
 WHERE
-  (continent = 'South America');
+  (subject = 'Peace')
+AND
+  (yr >= 2000);
 
 /*
 5.
-Show the name and population for France, Germany, Italy.
+Show all details (yr, subject, winner) of the Literature prize winners for 1980 to 1989 inclusive.
 */
 
 SELECT
-  name,
-  population
-FROM world
+  *
+FROM nobel
 WHERE
-  (name IN ('France',
-            'Germany',
-            'Italy'));
+  (subject = 'Literature')
+AND
+  (yr BETWEEN 1980 AND 1989);
 
 /*
 6.
-Show the countries which have a name that includes the word 'United'.
+Show all details of the presidential winners:
+Theodore Roosevelt
+Woodrow Wilson
+Jimmy Carter
+Barack Obama
+SELECT * FROM nobel
+ WHERE yr = 1970
+  AND subject IN ('Cookery',
+                  'Chemistry',
+                  'Literature')
 */
 
 SELECT
-  name
-FROM world
+  *
+FROM nobel
 WHERE
-  (name LIKE '%United%');
+  (winner IN ('Theodore Roosevelt',
+              'Woodrow Wilson',
+              'Jimmy Carter',
+              'Barack Obama'));
 
 /*
 7.
-Two ways to be big: A country is big if it has an area of more than 3 million sq km or it has a population of more than 250 million.
-Show the countries that are big by area or big by population. Show name, population and area.
+Show the winners with first name John.
 */
 
 SELECT
-  name,
-  population,
-  area
-FROM world
+  winner
+FROM nobel
 WHERE
-  (area > 3000000)
-OR
-  (population > 250000000);
+  (winner LIKE 'John%');
 
 /*
 8.
-Exclusive OR (XOR). Show the countries that are big by area or big by population but not both. Show name, population and area.
-Australia has a big area but a small population, it should be included.
-Indonesia has a big population but a small area, it should be included.
-China has a big population and big area, it should be excluded.
-United Kingdom has a small population and a small area, it should be excluded.
+Show the year, subject, and name of Physics winners for 1980 together with the Chemistry winners for 1984.
 */
 
 SELECT
-  name,
-  population,
-  area
-FROM world
+  *
+FROM nobel
 WHERE
-  (area > 3000000)
-XOR
-  (population > 250000000);
+  ((subject = 'Physics')
+  AND
+  (yr = 1980))
+OR
+  ((subject = 'Chemistry')
+  AND
+  (yr = 1984));
 
 /*
 9.
-Show the name and population in millions and the GDP in billions for the countries of the continent 'South America'. Use the ROUND function to show the values to two decimal places.
-https://sqlzoo.net/wiki/ROUND
-For South America show population in millions and GDP in billions both to 2 decimal places.
-	Millions and billions
-Divide by 1000000 (6 zeros) for millions. Divide by 1000000000 (9 zeros) for billions.
+Show the year, subject, and name of winners for 1980 excluding Chemistry and Medicine.
 */
 
 SELECT
-  name,
-  round((population/1000000), 2) AS "population in millions",
-  round((gdp/1000000000), 2) AS "GDP in billions"
-FROM world
+  *
+FROM nobel
 WHERE
-  (continent = 'South America');
+  (subject NOT IN ('Chemistry',
+                   'Medicine'))
+AND
+  (yr = 1980);
 
 /*
 10.
-Show the name and per-capita GDP for those countries with a GDP of at least one trillion (1000000000000; that is 12 zeros). Round this value to the nearest 1000.
-Show per-capita GDP for the trillion dollar countries to the nearest $1000.
+Show year, subject, and name of people who won a 'Medicine' prize in an early year (before 1910, not including 1910) together with winners of a 'Literature' prize in a later year (after 2004, including 2004.
 */
 
 SELECT
-  name,
-  (round(((gdp/population) / 1000)) * 1000) AS "Per-Capita GDP"
-FROM world
+  *
+FROM nobel
 WHERE
-  (gdp > 1000000000000);
+  ((subject = 'Medicine')
+  AND
+  (yr < 1910))
+OR
+  ((subject = 'Literature')
+  AND
+  (yr >= 2004));
 
 /*
 11.
-Greece has capital Athens.
-Each of the strings 'Greece', and 'Athens' has 6 characters.
-Show the name and capital where the name and the capital have the same number of characters.
-You can use the LENGTH function to find the number of characters in a string.
-https://sqlzoo.net/wiki/LENGTH
-SELECT name, LENGTH(name), continent, LENGTH(continent), capital, LENGTH(capital)
-  FROM world
- WHERE name LIKE 'G%'
+Find all details of the prize won by PETER GRUNBERG
+Non-ASCII characters
+The u in his name has an umlaut. You may find this link useful.
+https://en.wikipedia.org/wiki/%C3%9C#Keyboarding
 */
 
 SELECT
-  name,
-  capital
-FROM world
+  *
+FROM nobel
 WHERE
-  (length(name) = length(capital));
+  (winner = 'PETER GRÜNBERG');
 
 /*
 12.
-The capital of Sweden is Stockholm. Both words start with the letter 'S'.
-Show the name and the capital where the first letters of each match. Don't include countries where the name and the capital are the same word.
-You can use the function LEFT to isolate the first character.
-You can use <> as the NOT EQUALS operator.
-https://sqlzoo.net/wiki/LEFT
-SELECT name, LEFT(name,1), capital
-FROM world
+Find all details of the prize won by EUGENE O'NEILL
+Escaping single quotes
+You can't put a single quote in a quote string directly. You can use two single quotes within a quoted string.
 */
 
 SELECT
-  name,
-  capital
-FROM world
+  *
+FROM nobel
 WHERE
-  (left(name, 1) = left(capital, 1))
-AND
-  (name <> capital);
+  (winner = 'EUGENE O''NEILL');
 
 /*
 13.
-Equatorial Guinea and Dominican Republic have all of the vowels (a e i o u) in the name. They don't count because they have more than one word in the name.
-Find the country that has all the vowels and no spaces in its name.
-You can use the phrase name NOT LIKE '%a%' to exclude characters from your results.
-The query shown misses countries like Bahamas and Belarus because they contain at least one 'a'.
-SELECT name
-   FROM world
-WHERE name LIKE 'B%'
-  AND name NOT LIKE '%a%'
+Knights in order
+List the winners, year and subject where the winner starts with Sir. Show the the most recent first, then by name order.
 */
 
 SELECT
-  name
-FROM world
+  winner,
+  yr,
+  subject
+FROM nobel
 WHERE
-  (name NOT LIKE '% %')
-AND
-  (name LIKE '%a%')
-AND
-  (name LIKE '%e%')
-AND
-  (name LIKE '%i%')
-AND
-  (name LIKE '%o%')
-AND
-  (name LIKE '%u%');
+  (winner LIKE 'Sir%')
+ORDER BY yr DESC;
+
+/*
+14.
+The expression subject IN ('Chemistry','Physics') can be used as a value - it will be 0 or 1.
+Show the 1984 winners and subject ordered by subject and winner name; but list Chemistry and Physics last.
+SELECT winner, subject, subject IN ('Physics','Chemistry')
+  FROM nobel
+ WHERE yr=1984
+ ORDER BY subject,winner
+*/
+
+SELECT
+  winner,
+  subject
+FROM nobel
+WHERE
+  (yr = 1984)
+ORDER BY
+  CASE WHEN subject IN ('Physics',
+                        'Chemistry')
+  THEN
+    1
+  ELSE
+    0
+  END,
+  subject, winner;
